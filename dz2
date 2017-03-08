@@ -1,0 +1,43 @@
+<?php
+error_reporting(-1);
+
+$x = $_GET['x'];
+$num1 = 10;
+$num2 = 20;
+$num3 = 0;
+
+echo '<br>';
+
+function checking(){
+	global $x;
+	global $num1;
+	global $num2;
+	global $num3;
+	
+	$x_int = (int) $x;
+	
+	echo 'Число ' .$x_int. '<br>';
+	echo $num1 . '<br>';
+	echo $num2 . '<br>';
+	echo $num3 . '<br>';
+	echo '<br>';
+	
+	if($num1 > $x_int){
+		return 'Задуманное число не входит в числовой ряд' . '<br>';
+	}
+
+	else{
+		if($num1 === $x_int){
+			return 'Задуманное число входит в числовой ряд' . '<br>';
+		}
+		elseif($num1 !== $x_int){
+			$num3 = $num1;
+			$num1 = $num1 + $num2;
+			$num2 = $num3;
+		}
+	}
+}
+
+echo checking(); 
+echo checking(); 
+echo checking();
