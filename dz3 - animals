@@ -1,0 +1,91 @@
+<?php
+$continents = [
+    'Africa' => [
+        'African elephant',
+        'Hippo',
+        'Giraffe',
+        'Crocodile',
+        'Spotted hyena',
+        'Zebra',
+        'Chimpanzee',
+        'Python',
+        'Scorpio',
+        'Canna',
+    ],
+    'Eurasia' => [
+        'Tapir',
+        'Snow leopard',
+        'Varan',
+        'Big panda',
+        'Capercaillie',
+        'Pheasant',
+        'Mantis',
+        'Brown bear',
+        'Sable',
+        'Wolf'
+    ]
+];
+
+$new_arr2 = [];
+ 
+foreach($continents as $continent => $animals){
+    foreach($animals as $animal){
+        $new_arr = [];
+        $anim = explode(' ', $animal);
+        $new_arr[]=$anim;
+		
+        foreach($new_arr as $k){
+            if(count($k) === 2){
+				$comma_separated = implode(",", $k);
+                $str = str_replace(',', ' ', $comma_separated);
+                $new_arr2[]=$str;
+            }
+        }
+    }
+}
+
+echo '<pre>';
+var_dump($new_arr2);
+echo '<pre>';
+
+foreach($new_arr2 as $name){
+    $parts = explode(' ', $name);
+    $first[] = $parts[0];
+    $second[] = $parts[1];
+}
+ 
+ /*
+echo '<pre>';
+var_dump($first);
+var_dump($second);
+echo '<pre>';
+*/
+ 
+$new_arr3 = [];
+while (count($new_arr3) < count($new_arr2)){
+   $proverka = $first[rand(0, count($new_arr2)-1)];
+	if (!in_array($proverka, $new_arr3)) {
+		array_push($new_arr3, $proverka);
+	}
+}
+
+//var_dump($new_arr3);
+
+$new_arr4 = [];
+
+while (count($new_arr4) < count($new_arr2)){
+    $proverka = $second[rand(0, count($new_arr2)-1)];
+    if (!in_array($proverka, $new_arr4)) {
+		array_push($new_arr4, $proverka);
+    }
+}
+
+//var_dump($new_arr4 );
+
+$new_arr5 = [];
+
+for($i = 0; $i < count($new_arr2); $i++){
+	$new_arr5[]= $new_arr3[$i] . ' ' . $new_arr4[$i];	
+}
+
+var_dump($new_arr5);
