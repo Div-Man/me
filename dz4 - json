@@ -1,0 +1,22 @@
+<?php
+$content = file_get_contents('weather.json');
+$user = json_decode($content, true);
+
+echo '<pre>';
+var_dump($user);
+echo '</pre>';
+
+$temp = $user['main']['temp'] - 273.15;
+$city = $user['name'];
+$sky = $user['weather'][0]['description'];
+$pressure = $user['main']['pressure'];
+$humidity = $user['main']['humidity'];
+$visibility = $user['visibility'];
+$wind_speed = $user['wind']['speed'];
+
+echo 'Текущая температура в ' . $city .' ' . $temp . ' градус(а) <br>';
+echo '<strong>Небо - </strong> ' . $sky . '<br>';
+echo '<strong>Давление - </strong> ' . $pressure . '<br>';
+echo '<strong>Влажность - </strong> ' . $humidity . '<br>';
+echo '<strong>Видимость - </strong> ' . $visibility . '<br>';
+echo '<strong>Скорость ветра - </strong> ' . $wind_speed . '<br>';
