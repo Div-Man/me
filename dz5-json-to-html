@@ -1,0 +1,43 @@
+<?php
+error_reporting(-1);
+ini_set('display_errors', 'On');
+mb_internal_encoding('utf-8');
+
+$decode = file_get_contents('user.json');
+$decode2 = json_decode($decode);
+
+echo '<pre>';
+var_dump($decode2);
+echo '</pre>';
+
+$th_name = []; //для самой верхней строки
+
+echo '<pre>';
+var_dump($decode2[0]);
+echo '</pre>';
+
+foreach($decode2[0] as $key => $val){
+	$key . '<br>';
+	array_push($th_name, $key);
+}
+
+echo '<pre>';
+var_dump($th_name);
+echo '</pre>';
+
+echo '<table border="1" cellpadding="10">';
+	for($i = 0; $i < count($th_name); $i++){
+		echo '<th>';
+		echo $th_name[$i];
+		echo '</th>';
+	}
+	foreach($decode2 as $k => $v){
+	echo '<tr>';
+			foreach($v as $kl => $value){
+				echo '<td>';
+				echo $value;
+				echo '</td>';
+			}
+	echo '</tr>';
+	}
+echo '</table>';
