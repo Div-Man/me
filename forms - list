@@ -1,0 +1,32 @@
+<?php
+error_reporting(-1);
+ini_set('display_errors', 'On');
+header('Content-Type: text/html; charset=utf-8');
+
+$files = scandir(__DIR__ . '/' . 'test');
+$title = 'Список загруженных тестов'
+
+?>
+
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Список загруженныйх тестов</title>
+	</head>
+<body>
+
+<h2><?php echo $title?></h2>
+
+<ul>
+	<?php
+		foreach ($files as $f) {
+			if(pathinfo($f, PATHINFO_EXTENSION) == 'json'){
+				echo '<li>' . $f . '</li>';
+			}
+		}
+	?>
+</ul>
+	
+</body>
+</html>
