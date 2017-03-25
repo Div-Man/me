@@ -1,0 +1,83 @@
+<?php
+error_reporting(-1);
+ini_set('display_errors', 'On');
+
+$help = 'Что бы увидеть тест, введите параметр test, напимер ?test=номер теста' . '<br>';
+
+echo $help;
+
+if(isset($_GET['test'])){
+	$getParametr = true;
+	if (file_exists('test/test' . $_GET['test'] . '.json')){
+		$file = file_get_contents('test/test' . $_GET['test'] . '.json', true);
+		$a = 1;
+	}
+	else{
+		echo 'Такого теста не существует';
+		die();
+	}
+	
+	$decode = json_decode($file, true);
+	
+	/*
+	echo '<pre>';
+	var_dump($decode);
+	echo '</pre>';
+	*/
+	
+	$primer = $decode["calculate"]["description"];
+	$answer = $decode["calculate"]["result"];
+	$type = $decode["calculate"]["input"]["type"];
+	
+	//echo $answer;
+	
+	$fp = fopen('answer.txt', 'w'); // Открываем файл в режиме записи 
+	
+	$test = fwrite($fp, $answer); // Запись в файл
+	//if ($test) echo 'Ответ сохранён.';
+	//else echo 'Ошибка при записи в файл.';
+	fclose($fp); //Закрытие файла
+}
+
+else{
+	$getParametr = false;
+}
+
+if(isset($_GET['sum'])){
+	$file = file_get_contents('answer.txt', true);
+	
+	if($_GET['sum'] == $file){
+		echo 'Ответ правильный';
+		die();
+	}
+	else{
+		echo 'Ответ не правильный';
+		die();
+	}
+}
+
+?>
+
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Генератор тестов</title>
+	</head>
+<body>
+	<h2>Решите пример</h2>
+	<form action="" method="get">
+		<label for="sum">
+		
+		<?php if($getParametr) {
+				echo $decode["calculate"]["description"];
+			} 
+			else die();
+		?>
+		</label>
+		
+		<input type="<?php echo $type?>" name="sum" id="sum">
+		<input type="submit" value="Проверить">
+	</form>
+</body>
+</html>
