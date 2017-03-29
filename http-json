@@ -1,0 +1,12 @@
+{
+	"calculate" : {
+		"description" : "3+3?=",
+		"input" : {
+			"type" : "text",
+			"name" : "number1"
+		},
+		"result" : 6
+	}
+}
+
+//этот файл должен хранится в папке test
