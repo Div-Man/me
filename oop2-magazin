@@ -1,0 +1,64 @@
+<?php
+header('Content-Type: text/html; charset:utf-8');
+error_reporting(-1);
+
+abstract class Product{
+	public function __construct($title, $price, $weight, $delivery=250){
+		$this->title = $title;
+		$this->price = $price;
+		$this->weight = $weight;
+		$this->delivery = $delivery;
+	}
+}
+
+class Planshet extends Product{
+	public $discount = 10;
+	
+	public function getPrice(){
+		if ($this->discount) {
+			$this->delivery = 300;
+			return round($this->price - ($this->price * $this->discount/100));
+		} 
+		else {
+			return $this->price;
+		}
+	}
+}
+
+class Potato extends Planshet{
+	public function getPrice(){
+		if ($this->weight > 10000) {
+			return round($this->price - ($this->price * $this->discount/100));
+		} 
+		else {
+			$this->delivery = 250;
+			return $this->price;
+		}
+	}
+}
+
+class Jacket extends Product{}
+
+$planshet = new Planshet('Планшет', 2000, 400);
+$potato = new Potato('Картошка', 700, 4000);
+$potato2 = new Potato('Ещё картошка', 700, 12000);
+$jacket = new Jacket('Куртка', 6300, 2000);
+
+?>
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+	</head>
+	<body>
+		<?php
+			echo $planshet->title . ' цена без скидки ' . $planshet->price . ', со скидкой ' . $planshet->getPrice() . ' Доставка ' . $planshet->delivery;
+			echo '<br>';
+			echo $potato->title . ' цена без скидки ' . $potato->price . ', со скидкой ' . $potato->getPrice() . ' Доставка ' . $planshet->delivery;
+			echo '<br>';
+			echo $potato2->title . ' цена без скидки ' . $potato2->price . ', со скидкой ' . $potato2->getPrice() . ' Доставка ' . $planshet->delivery;
+			echo '<br>';
+			echo $jacket->title. ' цена ' . $jacket->price;
+		?>
+	</body>
+</html>
