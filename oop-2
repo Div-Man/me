@@ -1,0 +1,249 @@
+<?php
+header('Content-Type: text/html; charset=utf-8');
+error_reporting(-1);
+
+class Car{
+	public $rusTrue = 'Выпущена в России';
+	public $rusFalse = 'Выпущена за границей';
+	
+	public function __construct($marka, $model, $year){
+		$this->marka = $marka;
+		$this->model = $model;
+		$this->year = $year;
+	}
+	public function isOld(){
+		if($this->year < 2005){
+			return 'Вашу машину ' . $this->marka. ' ' . $this->model.', пора отправить на реставрацию. ';
+		}
+		else{
+			return 'Ваша машина ' . $this->marka. ' ' . $this->model.', как новая. ';
+		}
+	}
+	public function isRus(){
+		switch(mb_strtolower($this->marka)){
+			case 'vaz':
+			case 'lada':
+			case 'uaz':
+			case 'gazel':
+			case 'volga':
+			case 'kamaz':
+			case 'zil':
+				return $this->rusTrue;
+			default:
+				return $this->rusFalse;
+		}
+	}
+}
+
+class ChildCar extends Car{
+	public function isRusOrNo(){
+		if($this->isRus() === $this->rusTrue){
+			return '<strong>' . $this->marka .'</strong>,' . ' на неё запчасти дешевле, чем на импортные машины';
+		}
+		else{
+			return '<strong>' . $this->marka .'</strong>,' . ' на неё запчасти дороже, чем на русские машины';
+		}
+	}
+}
+
+$vaz = new Car('VAZ', '21074', 2004);
+$bmw = new Car('BMW', '5', 2010);
+
+echo $vaz->isOld();
+echo $vaz->isRus();
+echo '<br>';
+echo $bmw->isOld();
+echo $bmw->isRus();
+
+echo '<br>';
+echo '<br>';
+$volga = new ChildCar('volga', '3110', 2005);
+$audi = new ChildCar('audi', '80', 2001);
+echo $volga->isRusOrNo();
+echo '<br>';
+echo $audi->isRusOrNo();
+
+echo '<br>';
+echo '-----------------------------------------------------<br>';
+/////////////////////////////////////////////////
+
+
+class Televizor{
+	public $ask = 'Какой телевизор вы хотите?';
+	protected $color = 'black';
+	
+	public function __construct($model){
+		$this->model = $model;
+	}
+	public function publicColor($value){
+		if(empty($value)){
+			return $this->color = $this->color;
+		}
+		return $this->color = $value;
+	}
+	public function wontTv($val){
+		return 'Я хочу телевизор ' . $this->model . ', '. $this->publicColor($val) . ' цвета';
+	}
+}
+
+class ChildTelevizor extends Televizor{
+	public function setColor(){
+		return $this->color = 'red';
+	}
+	
+	public function wontTv(){
+		return 'Я хочу телевизор ' . $this->model . ', '. $this->setColor() . ' цвета';
+	}
+	
+}
+
+$lg = new Televizor('Lg');
+echo $lg->ask;
+echo '<br>';
+echo $lg->wontTv('');
+
+echo '<br>';
+echo '<br>';
+
+$samsung = new Televizor('Samsung');
+echo $samsung->ask;
+echo '<br>';
+echo $samsung->wontTv('blue');
+
+
+echo '<br>';
+echo '<br>';
+
+$panasonic = new ChildTelevizor('Panasonic');
+echo $panasonic->ask;
+echo '<br>';
+echo $panasonic->wontTv();
+echo '<br>';
+
+
+echo '<br>';
+echo '-----------------------------------------------------<br>';
+/////////////////////////////////////////////////
+
+class BallPen{
+	protected $maxPen = 10;
+	
+	public function __construct($count){
+		$this->count = $count;
+	} 
+	public function PutPen(){
+		if($this->count < $this->maxPen){
+			return 'Осталось ' . ($this->maxPen - $this->count) . ' мест(а) для ручек';
+		}
+		elseif($this->count === $this->maxPen){
+			return 'В пенале больше места нет';
+		}
+		else{
+			return 'Столько ручек в пенал не влезит';
+		}
+	}
+}
+
+class SuperBallPen extends BallPen{
+
+	public function setMaxPen(){
+		return $this->maxPen = 20;
+	}
+	
+	public function PutPen(){
+		parent::PutPen();
+		echo 'Всего ' . $this->setMaxPen() . ' мест';
+	}
+	
+}
+
+$pen1 = new BallPen(8);
+$pen2 = new BallPen(10);
+$pen3 = new BallPen(13);
+
+echo $pen1->PutPen() . '<br>';
+echo $pen2->PutPen() . '<br>';
+echo $pen3->PutPen() . '<br>';
+
+$superPen = new SuperBallPen(10);
+echo $superPen->PutPen();
+
+echo '<br>';
+echo '-----------------------------------------------------<br>';
+/////////////////////////////////////////////////
+
+class Duck{
+	public $description = 'В каждом ящике по 5 уток';
+	public static $action = 'Привезли 1 ящик стало ';
+	
+	public static $contDuck = 0;
+	public static function duckIncrease($val){
+		return self::$action . ' ' .self::$contDuck=self::$contDuck+$val . ' уток';
+	}
+}
+
+class SuperDuck extends Duck{
+	public function actionDuck(){
+		return 'Они все раньше делали кря-кря';
+	}
+}
+
+$duck1 = new Duck(); 
+$duck2 = new Duck(); 
+$duck3 = new Duck(); 
+
+echo $duck1->description . '<br>';
+
+echo $duck1::duckIncrease(5) . '<br>';
+echo $duck2::duckIncrease(5) . '<br>';
+echo $duck3::duckIncrease(5) . '<br>';
+
+$superDuck = new SuperDuck();
+echo $superDuck::duckIncrease(5) . '<br>';
+echo $superDuck->actionDuck();
+
+echo '<br>';
+echo '-----------------------------------------------------<br>';
+/////////////////////////////////////////////////
+
+class Product{
+	public function __construct($product, $color){
+		$this->product = $product;
+		$this->color = $color;
+	}
+	public function importBread(){
+		if($this->color == 'белый'){
+			return $this->answerWhite();
+		}
+		
+		elseif($this->color == 'чёрный'){
+			return $this->answerBlack();
+		}
+	}
+	public function answerWhite(){
+		return 'Привезли белый ' . $this->product;
+	}
+	
+	public function answerBlack(){
+		return 'Привезли чёрный ' . $this->product;
+	}
+}
+
+class NewProduct extends Product{
+	public function order(){
+		return 'Ваш заказ: ' . $this->product . ' ' . $this->color . ' отправлен';
+	}
+}
+
+$bread = new Product('хлеб', 'чёрный');
+$bread2 = new Product('хлеб', 'белый');
+
+echo $bread->importBread();
+echo '<br>';
+echo $bread2->importBread();
+echo '<br>';
+echo '<br>';
+
+$order = new NewProduct('хлеб', 'белый');
+echo $order->order();
+
