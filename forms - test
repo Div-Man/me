@@ -2,15 +2,14 @@
 error_reporting(-1);
 ini_set('display_errors', 'On');
 
-$help = 'Что бы увидеть тест, введите параметр test, напимер ?test=номер теста' . '<br>';
-
-echo $help;
-
 if(isset($_GET['test'])){
 	$getParametr = true;
-	if (file_exists('test/test' . $_GET['test'] . '.json')){
-		$file = file_get_contents('test/test' . $_GET['test'] . '.json', true);
-		$a = 1;
+	if (file_exists('test/' . $_GET['test'])){
+		$file = file_get_contents('test/'. $_GET['test'], true);
+	}
+	elseif(!file_exists('test/' . $_GET['test'])){
+		echo 'Такого теста не существует';
+		die();
 	}
 	else{
 		echo 'Такого теста не существует';
@@ -19,24 +18,14 @@ if(isset($_GET['test'])){
 	
 	$decode = json_decode($file, true);
 	
-	/*
-	echo '<pre>';
-	var_dump($decode);
-	echo '</pre>';
-	*/
-	
 	$primer = $decode["calculate"]["description"];
 	$answer = $decode["calculate"]["result"];
 	$type = $decode["calculate"]["input"]["type"];
 	
-	//echo $answer;
+	$fp = fopen('answer.txt', 'w'); 
 	
-	$fp = fopen('answer.txt', 'w'); // Открываем файл в режиме записи 
-	
-	$test = fwrite($fp, $answer); // Запись в файл
-	//if ($test) echo 'Ответ сохранён.';
-	//else echo 'Ошибка при записи в файл.';
-	fclose($fp); //Закрытие файла
+	$test = fwrite($fp, $answer); 
+	fclose($fp);
 }
 
 else{
@@ -55,7 +44,6 @@ if(isset($_GET['sum'])){
 		die();
 	}
 }
-
 ?>
 
 <!doctype html>
@@ -65,7 +53,20 @@ if(isset($_GET['sum'])){
 		<title>Генератор тестов</title>
 	</head>
 <body>
-	<h2>Решите пример</h2>
+<?php
+	if(!isset($_GET['test'])){
+		$message = 'Вы напрямую открыли эту страницу, для того, ';
+		$message .= 'что бы увидеть контент, воспользуйтесь ';
+		$message .= 'страницей <a href="list.php">list.php</a> ' ;
+		$message .= 'и перейдите по ссылкам.';
+		echo $message;
+	}
+?>
+	<?php 
+		if(isset($_GET['test'])){
+			echo '<h2>Решите пример</h2>';
+		}
+	?>
 	<form action="" method="get">
 		<label for="sum">
 		
@@ -75,9 +76,14 @@ if(isset($_GET['sum'])){
 			else die();
 		?>
 		</label>
-		
 		<input type="<?php echo $type?>" name="sum" id="sum">
 		<input type="submit" value="Проверить">
 	</form>
+	<?php
+	
+	if(isset($_GET['test'])){
+			echo '<p><a href="list.php">Вернутся к выбору теста</a> | <a href="admin.php">Загрузить новый</a></p>';
+		}
+	?>	
 </body>
 </html>
