@@ -4,15 +4,14 @@ ini_set('display_errors', 'On');
 header('Content-Type: text/html; charset=utf-8');
 
 $files = scandir(__DIR__ . '/' . 'test');
-$title = 'Список загруженных тестов'
-
+$title = 'Список загруных тестов';
 ?>
 
 <!doctype html>
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>Список загруженныйх тестов</title>
+		<title><?php echo $title?></title>
 	</head>
 <body>
 
@@ -22,11 +21,16 @@ $title = 'Список загруженных тестов'
 	<?php
 		foreach ($files as $f) {
 			if(pathinfo($f, PATHINFO_EXTENSION) == 'json'){
-				echo '<li>' . $f . '</li>';
+				echo '<li><a href="./test.php?test=' . $f .'">' . $f .'</a></li>';
 			}
 		}
 	?>
 </ul>
+
+<p>
+	<a href="admin.php">Перейти на страницу загрузки теста</a>
+</p>
 	
 </body>
 </html>
+
