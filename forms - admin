@@ -2,30 +2,26 @@
 error_reporting(-1);
 ini_set('display_errors', 'On');
 
-if($_FILES){
-	if(isset($_FILES)){
-		$testName = $_FILES['test']['name'];
+$testName = isset($_FILES['test']['name']) ? $_FILES['test']['name'] : '';
+
+$testTmpFileName = isset($_FILES['test']['tmp_name']) ? $_FILES['test']['tmp_name'] : '';
+
+$testFileName = './test/'. $testName;
+
+if(isset($_FILES['test'])){
+	
+		
+	if(is_uploaded_file($testTmpFileName)) {
+		if (file_exists($testFileName)) {
+			echo '<p>Такой файл уже есть, выберите другой</p>';
+			die();
+		}	
+		move_uploaded_file($testTmpFileName, $testFileName);
+		echo '<p>Файл загружен</p>';
 	}
 	else{
-		$testName = '';
+		echo '<p>Ошибка</p>';
 	}
-	if(empty($testName)){
-		echo 'Згрузите тест';
-	}
-	
-	echo $testName;
-	
-	$testTmpFileName = isset($_FILES['test']['tmp_name']) ? $_FILES['test']['tmp_name'] : '';
-	
-	if($testTmpFileName){
-		$testFileName = './test/'. $testName;//путь теста
-		$successMoved = move_uploaded_file($testTmpFileName, $testFileName); //перемещаю файл
-	}
-	
-	echo '<pre>';
-	var_dump($_FILES);
-	echo '</pre>';
-	
 }
 ?>
 
@@ -41,5 +37,9 @@ if($_FILES){
 		<input type="file" name="test" id="file">
 		<input type="submit" value="Загрузить">
 	</form>
+	
+	<p>
+		<a href="list.php">Перейти к выбору теста</a>
+	</p>
 </body>
 </html>
