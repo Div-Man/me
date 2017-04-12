@@ -1,15 +1,14 @@
 <?php
+header('Content-Type: text/html; charset=utf-8');
 error_reporting(-1);
 ini_set('display_errors', 'On');
+
+$getParametr = false;
 
 if(isset($_GET['test'])){
 	$getParametr = true;
 	if (file_exists('test/' . $_GET['test'])){
 		$file = file_get_contents('test/'. $_GET['test'], true);
-	}
-	elseif(!file_exists('test/' . $_GET['test'])){
-		echo 'Такого теста не существует';
-		die();
 	}
 	else{
 		echo 'Такого теста не существует';
@@ -28,9 +27,6 @@ if(isset($_GET['test'])){
 	fclose($fp);
 }
 
-else{
-	$getParametr = false;
-}
 
 if(isset($_GET['sum'])){
 	$file = file_get_contents('answer.txt', true);
@@ -55,35 +51,31 @@ if(isset($_GET['sum'])){
 <body>
 <?php
 	if(!isset($_GET['test'])){
-		$message = 'Вы напрямую открыли эту страницу, для того, ';
-		$message .= 'что бы увидеть контент, воспользуйтесь ';
-		$message .= 'страницей <a href="list.php">list.php</a> ' ;
-		$message .= 'и перейдите по ссылкам.';
+		$message = '<p>Вы напрямую открыли эту страницу, для того, что бы увидеть контент, воспользуйтесь страницей <a href="list.php">list.php</a> и перейдите по ссылкам. </p>';
 		echo $message;
 	}
-?>
-	<?php 
-		if(isset($_GET['test'])){
-			echo '<h2>Решите пример</h2>';
-		}
-	?>
-	<form action="" method="get">
-		<label for="sum">
-		
-		<?php if($getParametr) {
-				echo $decode["calculate"]["description"];
-			} 
-			else die();
-		?>
-		</label>
-		<input type="<?php echo $type?>" name="sum" id="sum">
-		<input type="submit" value="Проверить">
-	</form>
-	<?php
+
+	if(isset($_GET['test'])){
+		echo '<h2>Решите пример</h2>';
+			
+		echo '<form action="" method="get">';
+		echo '<label for="sum">';
+			
+		if($getParametr) {
+			echo $decode["calculate"]["description"];
+		} 
+		else die();
+			
+		echo '</label>';
+		echo '<input type="' .$type . '" name="sum" id="sum">';
+			
+		echo '<input type="submit" value="Проверить">';
+		echo '</form>';
+	}
 	
 	if(isset($_GET['test'])){
-			echo '<p><a href="list.php">Вернутся к выбору теста</a> | <a href="admin.php">Загрузить новый</a></p>';
-		}
-	?>	
+		echo '<p><a href="list.php">Вернутся к выбору теста</a> | <a href="admin.php">Загрузить новый</a></p>';
+	}
+?>	
 </body>
 </html>
