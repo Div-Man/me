@@ -1,0 +1,145 @@
+<?php
+header('Content-Type: text/html; charset=utf-8');
+error_reporting(-1);
+
+$pdo = new PDO('mysql:host=localhost; dbname=dz; charset=utf8', 'root', '');
+
+$statement = $pdo->prepare('SELECT * FROM `books`');
+$statement->execute();
+
+$books = $statement->fetchAll();
+
+$formName = '';
+
+$searchForm = [];
+
+if(!empty($_GET['author']) || !empty($_GET['name'])){
+
+	$searchForm[] = $_GET['name'];
+	$searchForm[] = $_GET['author'];
+	
+	$need = '';
+	$needSql = '';
+	
+	if(!empty($searchForm[0])){
+		$need = $searchForm[0];
+		$needSql = 'name';
+	}
+	if(!empty($searchForm[1])){
+		$need = $searchForm[1];
+		$needSql = 'author';
+	}
+	
+	$sth2 = $pdo->prepare('SELECT * FROM `books` WHERE `'.$needSql.'` LIKE :search'); 
+	$sth2->execute([':search'=>'%'.$need.'%%']);
+
+
+echo <<<HERE
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<style>
+		h1{margin:0; margin-bottom: 21px;}
+		form{margin-bottom: 1em;}
+		table{
+			border-spacing: 0;
+			border-collapse: collapse;
+		}
+		.gray{background: #eee;}
+		table td, table th{
+			border: 1px solid #ccc;
+			padding: 5px;
+		}
+	</style>
+</head>
+	<body>
+	
+<h1>Библиотека успешного человека</h1>
+<form>
+	<input type="text" name="isbn" placeholder="ISBN">
+	<input type="text" name="name" placeholder="Название книги">
+	<input type="text" name="author" placeholder="Автор книги">
+	<input type="submit" value="Поиск">
+</form>
+	 <table>
+	<tr class="gray">
+		<th>Название</th>
+		<th>Автор</th>
+		<th>Год выпуска</th>
+		<th>Жанр</th>
+		<th>ISBN</th>
+	</tr>
+HERE;
+	
+	while($bookName = $sth2->fetch()){
+		if($bookName['name']){
+		
+			echo '<tr>';
+				echo'<td>' . $bookName['name'] . '</td>';
+				echo'<td>' . $bookName['author'] . '</td>';
+				echo'<td>' . $bookName['year'] . '</td>';
+				echo'<td>' . $bookName['genre'] . '</td>';
+				echo'<td>' . $bookName['isbn'] . '</td>';
+			echo '</tr>';
+			
+		}
+	}
+	echo '</table>';
+echo '</body>';
+echo '</html>';
+}
+
+else{
+echo <<<HERE
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<style>
+		h1{margin:0; margin-bottom: 21px;}
+		form{margin-bottom: 1em;}
+		table{
+			border-spacing: 0;
+			border-collapse: collapse;
+		}
+		.gray{background: #eee;}
+		table td, table th{
+			border: 1px solid #ccc;
+			padding: 5px;
+		}
+	</style>
+</head>
+	<body>
+	<h1>Библиотека успешного человека</h1>
+	<form>
+		<input type="text" name="isbn" placeholder="ISBN">
+		<input type="text" name="name" placeholder="Название книги">
+		<input type="text" name="author" placeholder="Автор книги">
+		<input type="submit" value="Поиск">
+	</form>
+		 <table>
+		<tr class="gray">
+			<th>Название</th>
+			<th>Автор</th>
+			<th>Год выпуска</th>
+			<th>Жанр</th>
+			<th>ISBN</th>
+		</tr>
+HERE;
+
+	foreach($books as $book){
+		echo '<tr>';
+			echo'<td>' . $book['name'] . '</td>';
+			echo'<td>' . $book['author'] . '</td>';
+			echo'<td>' . $book['year'] . '</td>';
+			echo'<td>' . $book['genre'] . '</td>';
+			echo'<td>' . $book['isbn'] . '</td>';
+		echo '</tr>';
+	}
+}
+	echo '</table>';
+echo '</body>';
+echo '</html>';
+
+?>
