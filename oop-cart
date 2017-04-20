@@ -1,0 +1,68 @@
+<?php
+abstract class Product{
+	public $title;
+    public $price;
+	public $numberProduct;
+	
+	public function __construct($title, $price, $numberProduct = 1){
+		$this->title = $title;
+		$this->price = $price;
+		$this->numberProduct = $numberProduct;
+	}
+}
+
+class Cart{
+	public $countProduct = [];
+	
+	public function addProduct($product){
+		$getProduct = '';
+		
+		if(array_key_exists($product->title, $this->countProduct)){
+          $this->countProduct[$product->numberProduct++] = $product;
+			echo 'Товар добавлен в корзину';
+		}
+		else{
+			$this->countProduct[$product->title] = $product;
+			echo 'Товар добавлен в корзину';
+		}
+		
+	}
+	
+	public function deleteProduct($product){
+		
+		echo $product->title;
+		
+		foreach($this->countProduct as $key => $value){
+			if($product->title == $key){
+				unset($this->countProduct[$product->title]);
+				echo 'Товар удалён из корзины';
+			}
+		}
+	}
+}
+
+class Planshet extends Product{}
+
+$planshet = new Planshet('Asus', 2000);
+$planshet2 = new Planshet('Lenovo', 3000);
+$planshet3 = new Planshet('Lenovo', 3000);
+
+$korzina = new Cart();
+
+echo '<pre>';
+var_dump($korzina->countProduct);
+echo '</pre>';
+
+
+$korzina->addProduct($planshet); //добавляю товар в корзину
+$korzina->addProduct($planshet2); //добавляю товар в корзину
+$korzina->addProduct($planshet3); //добавляю товар в корзину
+
+echo '<pre>';
+var_dump($korzina->countProduct);
+echo '</pre>';
+
+$korzina->deleteProduct($planshet); //удаляю из корзины
+
+echo '<pre>';
+var_dump($korzina->countProduct);
