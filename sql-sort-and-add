@@ -1,0 +1,237 @@
+<?php
+
+if(empty($_POST) && empty($_GET)){
+	header('Content-Type: text/html; charset=utf-8');
+}
+
+error_reporting(-1);
+
+$host = 'localhost';
+$db = 'task';
+$user = 'root';
+$pass = '';
+$charset = 'utf8';
+
+$dsn = "mysql:host=$host; dbname=$db;charset=$charset";
+
+$opt = [
+	PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+    ];
+	
+$pdo = new PDO($dsn, $user, $pass, $opt);
+
+$statement = $pdo->prepare('SELECT * FROM `tasks`');
+
+$statement->execute();
+
+$todo = $statement->fetchAll();
+
+$sqlUpdate = 'UPDATE `tasks` SET `is_done` = 1 WHERE id =:id';
+$sqlUpdate = $pdo->prepare($sqlUpdate);
+
+if(!empty($_POST['update-description'])){
+	$sqlUpdateDescription = 'UPDATE `tasks` SET `description` = "' . (string)($_POST['update-description']) . '" WHERE id =:id';
+	$new = $sqlUpdateDescription = $pdo->prepare($sqlUpdateDescription);	
+}
+
+
+if(!empty($_POST['update'])){
+	$new->execute([':id' => (int)($_GET['id'] ?? 0)]);
+	header( 'Location: ./dz.php');
+}
+
+$sqlEdit = 'SELECT * FROM `tasks` WHERE id=:id';
+$sqlEdit = $pdo->prepare($sqlEdit);
+
+$sqlDelete = 'DELETE FROM `tasks` WHERE id =:id';
+$sqlDelete = $pdo->prepare($sqlDelete);
+
+
+function dbSort($select){
+	global $pdo; 
+		
+	$sqlSortStatus = 'SELECT `id`, `description`, `is_done`, `date_added` FROM `tasks` ORDER BY `' . $select . '`';
+	$sqlSortStatus = $pdo->prepare($sqlSortStatus);
+	$sqlSortStatus->execute();
+	$result = $sqlSortStatus->fetchAll();
+		
+echo <<<HTML
+		<table>
+			<tr class="gray">
+				<th>Описание задачи</th>
+				<th>Дата добавления</th>
+				<th>Статус</th>
+				<th></th>
+			</tr>
+					
+HTML;
+		
+foreach($result as $task){
+	echo '<tr>';
+		echo'<td>' . $task['description'] . '</td>';
+		echo'<td>' . $task['date_added'] . '</td>';
+		if($task['is_done'] === 0){
+			echo '<td class="orange">В процессе</td>';
+		}
+		else if($task['is_done'] === 1){
+			echo '<td class="green">Выполнено</td>';
+		}
+			echo '<td><a href="?id=' . $task['id'] . '&task=edit">Изменить </a>';
+			echo '<a href="?id=' . $task['id'] . '&task=done">Выполнить</a> ';
+			echo '<a href="?id=' . $task['id'] . '&task=delete">Удалить</td>';
+			echo '</tr>';		
+	}
+}
+
+$date = date("Y-m-d H:i:s");
+
+if(!empty($_POST['add'])){
+	$task = trim((string)($_POST['add'] ?? ""));
+	$sqlNewTask = 'INSERT INTO `tasks` (`description`, `is_done`, `date_added`) VALUES ("' . $task . '", "0", "'. $date .'")';
+	$sqlNewTask = $pdo->prepare($sqlNewTask);
+}
+
+if(!empty($_POST['sort'])){
+
+	if($_POST['sort_by'][0] === 'date_added'){
+	
+		dbSort($_POST['sort_by'][0]);
+	}
+	if($_POST['sort_by'][0] === 'is_done'){
+		dbSort($_POST['sort_by'][0]);
+	}
+	
+	if($_POST['sort_by'][0] === 'description'){
+		dbSort($_POST['sort_by'][0]);
+	}
+}		
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<style>
+		
+		.float{
+			float: left; 
+			min-width: 200px;
+			padding-right: 20px;
+		}
+		h1{margin:0; margin-bottom: 21px;}
+		table{
+			border-spacing: 0;
+			border-collapse: collapse;
+		}
+		.gray{background: #eee;}
+		table td, table th{
+			border: 1px solid #ccc;
+			padding: 5px;
+		}
+		
+		.orange{
+			color: orange;
+		}
+		.green{
+			color: green;
+		}
+	</style>
+</head>
+	<body>
+	<h1>Список дел на сегодня</h1>
+	
+	<?php
+		if(empty($_GET)){
+echo <<<FORMA
+		<div class="add-task float">
+			<form method="POST">
+				<input type="text" name="add" placeholder="Описание задачи">
+				<input type="submit" name="btn" value="Добавить">
+			</form>
+		</div>
+FORMA;
+		}
+		
+		elseif(!empty($_GET['task'] === 'edit')){
+			$sqlEdit->execute([':id' => (int)$_GET['id'] ?? 0]);
+			$edit = $sqlEdit->fetchAll();
+			$answer = $edit[0]['description'];
+			
+echo <<<HERE
+			<div class="add-task float">
+				<form method="POST">
+					<input type="text" name="update-description" value="$answer">
+					<input type="submit" name="update" value="Сохранить">
+				</form>
+			</div>
+HERE;
+		}
+?>
+	<div class="float">
+		<form method="POST">
+			<label>Сортировать по:</label>
+			<select name="sort_by[]">
+				<option value="date_added">Дате добавления</option>
+				<option value="is_done">Статусу</option>
+				<option value="description">Описанию</option>
+			</select>
+			<input type="submit" name="sort" value="Отсортировать">
+		</form>
+	</div>
+	
+	<div style="clear: both;"></div>
+	<?php
+		if(!empty($_POST['add']) && !empty($_POST['btn'])){
+			
+			$sqlNewTask->execute();
+			header( 'Location: ./dz.php');
+		}
+	?>
+
+	<?php
+	if(empty($_POST)){
+		echo <<<HTML
+		<table>
+			<tr class="gray">
+				<th>Описание задачи</th>
+				<th>Дата добавления</th>
+				<th>Статус</th>
+				<th></th>
+			</tr>
+HTML;
+			
+			foreach($todo as $task){
+				echo '<tr>';
+					echo'<td>' . $task['description'] . '</td>';
+					echo'<td>' . $task['date_added'] . '</td>';
+					
+					if($task['is_done'] === 0){
+						echo '<td class="orange">В процессе</td>';
+					}
+					else if($task['is_done'] === 1){
+						echo '<td class="green">Выполнено</td>';
+					}
+					echo '<td><a href="?id=' . $task['id'] . '&task=edit">Изменить </a>';
+					echo '<a href="?id=' . $task['id'] . '&task=done">Выполнить</a> ';
+					echo '<a href="?id=' . $task['id'] . '&task=delete">Удалить</td>';
+				echo '</tr>';
+			}
+			
+				if(!empty($_GET['task'])){
+					if($_GET['task'] === 'done'){
+						$sqlUpdate->execute([':id' => (int)$_GET['id'] ?? 0]);
+						header( 'Location: ./dz.php'); 
+					}
+					if($_GET['task'] === 'delete'){
+						$sqlDelete->execute([':id' => (int)$_GET['id'] ?? 0]);
+						header( 'Location: ./dz.php'); 
+					}
+				}	
+			}
+			
+		?>
+		</table>
+	</body>
+</html>
