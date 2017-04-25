@@ -1,0 +1,250 @@
+<?php
+header('Content-Type: text/html; charset=utf-8');
+error_reporting(-1);
+
+class Car {
+	private $model;
+	private $working = 0;
+	
+	public function __construct($model) {
+		$this->model = $model;
+	}
+	
+	public function getWorking() {
+		return $this->working;
+	}
+	
+	public function setWorking($value) {
+		 $this->working = $value;
+	}
+	
+	public function getModel() {
+		return $this->model;
+	}
+	
+	public function startEngine() {
+		if($this->getWorking() === 1) {
+			echo 'Двигатель заведён, не порть стартер!<br>';
+			return true;
+		}
+		echo 'Двигатель заведён<br>';
+		return $this->setWorking(1);
+	}
+	
+	public function goCar() {
+		if($this->getWorking() === 1){
+			echo 'Машина поехала<br>';
+		}
+		else {
+			echo 'Санала надо завести двигатель<br>';
+		}
+	}
+	
+	public function stopEngine() {
+		if($this->getWorking() === 1){
+			echo 'Двигатель заглушен<br>';
+			return $this->setWorking(0);
+		}
+		else {
+			echo 'Двигатель не заведён<br>';
+		}
+	}
+}
+
+$car1 = new Car('BMW');
+$car2 = new Car('Audi');
+
+$car1->startEngine();
+$car1->goCar();
+$car1->stopEngine();
+$car1->goCar();
+$car1->startEngine();
+$car1->startEngine();
+$car1->goCar();
+$car1->startEngine();
+$car1->stopEngine();
+$car1->goCar();
+$car1->startEngine();
+
+$car2->goCar();
+
+echo '<br>';
+echo '-------------------------------------------------------------';
+echo '<br>';
+/////////////////////////////////////////////////////
+
+class Televizor {
+	private $marka;
+	private $hasConsole;
+	private $display;
+	
+	public function __construct($marka, $hasConsole, $display) {
+		$this->marka = $marka;
+		$this->hasConsole = $hasConsole;
+		$this->display = $display;
+	}
+	
+	public function getMarka() {
+		return $this->marka;
+	}
+	
+	public function getDisplay() {
+		return $this->display;
+	}
+	
+	public function getConsole() {
+		if($this->hasConsole === 1){
+			return 'Пульт в комплекте';
+		}
+		else {
+			return 'Без пульта';
+		}
+	}
+}
+
+$t1 = new Televizor('Lg', 1, 22);
+$t2 = new Televizor('Lenovo', 0, 18);
+
+echo 'Марка: ' . $t1->getMarka() . '<br>';
+echo $t1->getConsole() . '<br>';
+echo 'Дисплей: ' . $t1->getDisplay() . '<br>';
+
+echo '<br>';
+
+echo 'Марка: ' . $t2->getMarka() . '<br>';
+echo $t2->getConsole() . '<br>';
+echo 'Дисплей: ' . $t2->getDisplay() . '<br>';
+
+echo '<br>';
+echo '-------------------------------------------------------------';
+echo '<br>';
+//////////////////////////////////////////////////////
+
+class BallPen {
+	private $color = 'blue';
+	private $maxPen = 10;
+	
+	public function getPen() {
+		return $this->color;
+	}
+	
+	public function __construct($count) {
+		$this->count = $count;
+	} 
+	public function putPen() {
+		if($this->count < $this->maxPen){
+			return 'Осталось ' . ($this->maxPen - $this->count) . ' мест(а) для ' . $this->getPen() .' ручек';
+		}
+		elseif($this->count === $this->maxPen) {
+			return 'В пенале больше места нет';
+		}
+		else {
+			return 'Столько ручек в пенал не влезит';
+		}
+	}
+}
+
+$pen1 = new BallPen(8);
+$pen2 = new BallPen(10);
+$pen3 = new BallPen(13);
+
+echo $pen1->putPen() . '<br>';
+echo $pen2->putPen() . '<br>';
+echo $pen3->putPen() . '<br>';
+
+echo '<br>';
+echo '-------------------------------------------------------------';
+echo '<br>';
+/////////////////////////////////////////////////////////////
+
+class Duck {
+	private $weight;
+	private const SMOKED = 'yes';
+	
+	private static $weightAllDuck = [];
+	
+	function getWeightOneDuck() {
+		return $this->weight;
+	}
+	
+	static function getWeightAllDuck() {
+		$result = 0;
+		foreach(self::$weightAllDuck as $val){
+			$result += $val;
+		}
+		return $result;
+	}
+	
+	public function __construct($weight) {
+		$this->weight = $weight;
+		self::$weightAllDuck[]=$weight;
+	}
+	
+	public $description = 'В каждом ящике по 5 уток';
+	public static $action = 'Привезли 1 ящик стало ';
+	
+	public static $contDuck = 0;
+	public static function duckIncrease($val){
+		return self::$action . ' ' . (self::$contDuck  = self::$contDuck + $val) . ' уток';
+		
+	}
+}
+
+$duck1 = new Duck(500); 
+$duck2 = new Duck(800); 
+$duck3 = new Duck(900); 
+
+echo $duck1->description . '<br>';
+
+echo $duck1::duckIncrease(5) . '<br>';
+echo $duck2::duckIncrease(5) . '<br>';
+echo $duck3::duckIncrease(5) . '<br>';
+
+echo 'Общий вес ' . (Duck::getWeightAllDuck());
+
+echo '<br>';
+echo '-------------------------------------------------------------';
+echo '<br>';
+//////////////////////////////////////////////////////////
+
+class Product {
+	private $name;
+	private $expires;
+	private $weight;
+	
+	public function __construct($name, $expires, $weight) {
+		$this->name = $name;
+		$this->expires = $expires;
+		$this->weight = $weight;
+	}
+	
+	public function getName() {
+		return $this->name;
+	}
+	
+	public function getData() {
+		return $this->expires;
+	}
+	
+	public function getWeight() {
+		return $this->weight;
+	}
+	
+	public function getExpires() {
+		$data1 = date('Ymd');
+		$data2 = date('Ymd', strtotime($this->getData()));
+		
+		if($data1 < $data2) {
+			return 'Продукт годен';
+		}
+		else {
+			return 'Продукт испорчен';
+		}
+	}
+}
+
+$p1 = new Product('Колбаса', '20.04.2017', 2);
+$p2 = new Product('Тушёнка', '30.04.2019', 5);
+
+echo 'Название продукта: ' . $p1->getName() . ', ' . $p1->getExpires() . '<br>';
+echo 'Название продукта: ' . $p2->getName() . ', ' . $p2->getExpires();
