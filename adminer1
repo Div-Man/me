@@ -1,0 +1,209 @@
+<?php
+
+error_reporting(-1);
+
+$host = 'localhost';
+$db = 'kakharov';
+$user = 'kakharov';
+$pass = 'neto0984';
+$charset = 'utf8';
+
+$dsn = "mysql:host=$host; dbname=$db;charset=$charset";
+
+$opt = [
+	PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+    ];
+	
+$pdo = new PDO($dsn, $user, $pass, $opt);
+
+
+if(!empty($_POST['createTable'])){
+		$nameTable =  		trim(htmlspecialchars($_POST['nameTable']));
+		$nameField =  		trim(htmlspecialchars($_POST['nameField']));
+		$field = 			trim(htmlspecialchars($_POST['field']));
+		$lengthField =  	trim(htmlspecialchars($_POST['lengthField']));
+		$defaultField = 	trim(htmlspecialchars($_POST['defaultField']));
+		
+		if(!empty($primaryField) && !empty($ai)){
+			$primaryField = 	trim(htmlspecialchars($_POST['primaryField']));
+			$ai = 				trim(htmlspecialchars($_POST['ai']));
+		}
+		
+	
+	$type = '';
+	
+	if(!empty($field)){
+		$type = "(" . $nameField . " " .  $field . "(" . $lengthField . ") " . $defaultField . ")";
+	}
+	
+	if(!empty($primaryField) && !empty($ai)){
+		$type = "(" . $nameField . " " .  $field . "(" . $lengthField . ") " . $defaultField . " AUTO_INCREMENT, PRIMARY KEY (". $nameField ."))";
+	}
+	
+	if(!empty($_POST['nameField2'])){
+		$nameField2 =  		trim(htmlspecialchars($_POST['nameField2']));
+		$field2 = 			trim(htmlspecialchars($_POST['field2']));
+		$lengthField2 =  	trim(htmlspecialchars($_POST['lengthField2']));
+		$defaultField2 = 	trim(htmlspecialchars($_POST['defaultField2']));
+		
+		$type = "(" . $nameField . " " .  $field . "(" . $lengthField . ") " . $defaultField . " AUTO_INCREMENT, " .
+			$nameField2 . " " . $field2 . "(" . $lengthField2 . ")" . ",
+					
+		
+		PRIMARY KEY (". $nameField ."))";
+	}
+	
+	
+	$createTable = "CREATE TABLE " . $nameTable . " " . $type;
+	
+	$addTable = $pdo->prepare($createTable);
+	$addTable->execute();	
+	
+	echo 'Таблица создана';
+	
+}
+
+if(!empty($_POST['addField'])){
+	echo 'Столбец добавлен';
+	
+	$nameTable = trim(htmlspecialchars($_POST['nameTable']));
+	$nameField = trim(htmlspecialchars($_POST['nameField']));
+	$field = trim(htmlspecialchars($_POST['field']));
+	$lengthField = trim(htmlspecialchars($_POST['lengthField']));
+	
+	$newStolb = "ALTER TABLE " . $nameTable . ' ADD ' . $nameField . ' ' . $field . '(' .  $lengthField . ')';
+	
+	$res = $pdo->prepare($newStolb);
+	$res->execute();
+
+}
+
+?>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<style>
+		table {
+			border-spacing: 0;
+			border-collapse: collapse;
+		}
+		
+		td, th {
+			border: 1px solid;
+			padding:10px;
+		}
+		
+		.center td{
+			text-align: center;
+		}
+	</style>
+</head>
+<body>	
+
+<p><a href="showtables.php">Перейти к просмотру таблиц</a></p>
+
+<form method="POST">
+	<table>
+	<tr class="center">
+		<td>Создать таблицу</td>
+		<td><input type="text" name="nameTable"></td>
+		<td>Длину вводить обязательно</td>
+		<td colspan="2">Это не обязательно</td>
+	</tr>
+	<tr>
+		<th>Имя поля</th>
+		<th>Тип</th>
+		<th>Длина</th>
+		<th>По умолчанию</th>
+		<th>Первичный ключ и AI</th>
+	</tr>
+	<tr>
+		<td><input type="text" name="nameField"></td>
+		<td>
+			<select name="field">
+				<option>INT</option>
+				<option>VARCHAR</option>
+				<option>CHAR</option>
+				<option>TEXT</option>
+			</select>
+		</td>
+		<td><input type="text" name="lengthField"></td>
+		<td>
+			<select name="defaultField">
+				<option>NULL</option>
+				<option>NOT NULL</option>
+			</select>
+		</td>
+		<td>
+			<select name="primaryField">
+				<option>---</option>
+				<option>PRIMARY</option>
+			</select>
+			<input type="checkbox" name="ai">
+		</td>
+	</tr>
+	
+	<tr>
+		<td><input type="text" name="nameField2"></td>
+		<td>
+			<select name="field2">
+				<option>INT</option>
+				<option>VARCHAR</option>
+				<option>CHAR</option>
+				<option>TEXT</option>
+			</select>
+		</td>
+		<td><input type="text" name="lengthField2"></td>
+		<td>
+			<select name="defaultField2">
+				<option>NULL</option>
+				<option>NOT NULL</option>
+			</select>
+		</td>
+		<td>
+			<select>
+				<option>---</option>
+				<option>PRIMARY</option>
+			</select>
+			<input type="checkbox">
+		</td>
+	</tr>
+	</table>
+	<input type="submit" value="Создать" name="createTable">
+</form>
+
+<br><br><br><br>
+<form method="POST">
+	<table>
+	<tr class="center">
+		<td>Добавить столбец в таблицу</td>
+		<td><input type="text" name="nameTable"></td>
+		<td>Длину вводить обязательно</td>
+	</tr>
+	<tr>
+		<th>Имя поля</th>
+		<th>Тип</th>
+		<th>Длина</th>
+	</tr>
+	<tr>
+		<td><input type="text" name="nameField"></td>
+		<td>
+			<select name="field">
+				<option>INT</option>
+				<option>VARCHAR</option>
+				<option>CHAR</option>
+				<option>TEXT</option>
+			</select>
+		</td>
+		<td><input type="text" name="lengthField"></td>
+	</tr>
+	
+	
+	</table>
+	<input type="submit" value="Добавить" name="addField">
+</form>
+</body>
+</html>	
