@@ -1,0 +1,175 @@
+<?php
+
+error_reporting(-1);
+
+$host = 'localhost';
+$db = 'kakharov';
+$user = 'kakharov';
+$pass = 'neto0984';
+$charset = 'utf8';
+
+$dsn = "mysql:host=$host; dbname=$db;charset=$charset";
+
+$opt = [
+	PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+    ];
+	
+$pdo = new PDO($dsn, $user, $pass, $opt);
+
+echo '<p><a href="1.php">Перейти к созданию таблицы или добавлению поля</a></p>';
+
+$showTables = "SHOW TABLES";
+
+$show = $pdo->prepare($showTables);
+$show->execute();
+
+$result = $show->fetchAll();
+
+
+
+
+function recordFile($file){
+	$fl = fopen("alter.txt", "w");
+	fwrite($fl, $file);
+			
+	fclose($fl);
+			
+	$table = fopen('tablename.txt', 'w');
+	fwrite($table, trim(htmlspecialchars($_GET['table'])));	
+	fclose($table);
+			
+}
+
+if(!empty($_GET['editfield'])){
+	echo '<form>
+			<label for="rename">Новое имя поля: </label>
+			<input type="text" id="rename" name="rename" value="'. $_GET['field'] .'">
+			<input type="hidden" name="type" value="' . $_GET['type'] .'">
+			<input type="submit" name="edit" value="Изменить">
+		</form>';
+			
+	$table = trim(htmlspecialchars($_GET['table']));
+	$field = trim(htmlspecialchars($_GET['field']));
+	
+	$zapros = "ALTER TABLE " . $table . " CHANGE " . $field . " ";
+	recordFile($zapros);
+}
+	
+	
+if(!empty($_GET['type2']) && !empty($_GET['table'])){
+	echo '<form>
+			<label for="rename">Новый тип поля: </label>
+			<input type="text" id="rename" name="rename" value="'. $_GET['type2'] .'">
+			<input type="submit" name="edit2" value="Изменить">
+		</form>';
+		
+		$table = trim(htmlspecialchars($_GET['table']));
+		$field = trim(htmlspecialchars($_GET['field']));
+			
+		$zapros = "ALTER TABLE " . $table . " CHANGE " . $field . " " . $field . " ";
+			
+		recordFile($zapros);
+}	
+
+function alter($rename, $type=null){
+	global $pdo;
+	$fl = file_get_contents('alter.txt', true);
+	$res = $fl . $rename . ' ' .  $type;
+	$fl2 = file_get_contents('tablename.txt', true);
+	$alterTable = $pdo->prepare($res);
+	$alterTable->execute();
+	header('Location: showtables.php?table=' . $fl2);
+}
+	
+	
+if(!empty($_GET['edit2'])){
+	alter($_GET['rename']);			
+}
+
+
+if(!empty($_GET['edit'])){
+	alter($_GET['rename'],  $_GET['type']);			
+}	
+
+if(!empty($_GET['delfielde']) && !empty($_GET['table'])){
+	$drop = 'ALTER TABLE ' . $_GET['table'] . ' DROP ' . $_GET['delfielde'];
+	echo $drop;
+	$del = $pdo->prepare($drop);
+	$del->execute();
+	echo 'Удалено';
+}
+		
+
+echo '<br>';
+echo '<br>';
+
+echo 'Выберите таблицу<br>';
+echo '<ol>';
+foreach($result as $table){
+	echo '<li><a href="?table=' . $table['Tables_in_kakharov'] .'">' . $table['Tables_in_kakharov']. '</a></li>';
+}
+echo '</ol>';
+
+echo '<br>';
+echo 'Выбрана таблица: ';
+
+
+if(!empty($_GET['table'])){
+	echo '<strong>' . $_GET['table'] . '</strong><br><br>';
+	
+	$describeTable = 'DESCRIBE ' . $_GET['table'];
+	$res = $pdo->prepare($describeTable);
+	$res->execute();
+	
+	$table = $res->fetchAll();
+	
+	echo '<table>';
+	echo '<tr>
+			<th>Field</th>
+			<th>Type</th>
+			<th>Null</th>
+			<th>Key</th>
+			<th>Default</th>
+			<th>Extra</th>
+			<th>Удаление столбца</th>
+		</tr>';
+	
+	foreach($table as $tab){
+	
+		echo '<tr>
+				<td>' .$tab['Field'] . ' <a href="?field=' . $tab['Field'] . '&' . 'table=' . $_GET['table'].'&editfield=ok&type=' . $tab['Type'].'">Изменить</a></td>
+				<td>' .$tab['Type'] . ' <a href="?field=' . $tab['Field'] . '&' . 'table=' . $_GET['table']. '&type2='. $tab['Type'] .'">Изменить</a></td>
+				<td>' .$tab['Null'] . '</td>
+				<td>' .$tab['Key'] . '</td>
+				<td>' .$tab['Default'] . '</td>
+				<td>' .$tab['Extra'] . '</td>
+				<td><a href="?delfielde=' . $tab['Field'] . '&table=' . $_GET['table'] . '">Удалить</a></td>
+			</tr>';
+	}
+	echo '</table>';
+}
+
+?>
+
+<head>
+	<meta charset="utf-8">
+	<style>
+		table {
+			border-spacing: 0;
+			border-collapse: collapse;
+		}
+		
+		td, th {
+			border: 1px solid;
+			padding:10px;
+		}
+		
+		.center td{
+			text-align: center;
+		}
+		
+		li{padding-bottom: 10px;}
+	</style>
+</hea
